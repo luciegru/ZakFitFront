@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C6D677092ED8C51800DA4DDF /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = C6D677082ED8C51800DA4DDF /* KeychainAccess */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C6537D192ED3709E0030CFB3 /* ZakFitFront.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZakFitFront.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6D677092ED8C51800DA4DDF /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = ZakFitFront;
 			packageProductDependencies = (
+				C6D677082ED8C51800DA4DDF /* KeychainAccess */,
 			);
 			productName = ZakFitFront;
 			productReference = C6537D192ED3709E0030CFB3 /* ZakFitFront.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = C6537D102ED3709E0030CFB3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C6D677072ED8C51800DA4DDF /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C6537D1A2ED3709E0030CFB3 /* Products */;
 			projectDirPath = "";
@@ -332,6 +341,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C6D677072ED8C51800DA4DDF /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C6D677082ED8C51800DA4DDF /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6D677072ED8C51800DA4DDF /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C6537D112ED3709E0030CFB3 /* Project object */;
 }
