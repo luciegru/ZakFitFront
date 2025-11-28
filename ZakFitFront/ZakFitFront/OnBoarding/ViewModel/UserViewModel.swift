@@ -83,39 +83,6 @@ class UserViewModel{
         .resume()
     }
     
-    func updateUser(with fields: [String: Any]) {
-        
-        
-        guard let token = token else {
-            print("mauvais token")
-            return
-        }
-        guard let url = URL(string: "http://localhost:8080/user/") else {
-            print("mauvais url")
-            return }
-        
-
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        request.httpBody = try? JSONSerialization.data(withJSONObject: fields)
-        
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error {
-                print("Erreur update:", error)
-                return
-            }
-
-            if let httpResponse = response as? HTTPURLResponse {
-                print("Status code:", httpResponse.statusCode)
-            }
-        }.resume()
-           
-    }
 
     
 }

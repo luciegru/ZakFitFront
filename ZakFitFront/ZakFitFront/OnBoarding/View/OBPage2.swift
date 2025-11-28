@@ -15,7 +15,6 @@ struct OBPage2: View {
     @State var selectedHeight: Int = 180
     @State var selectedDate: Date = Date.now
     @State private var showNext = false
-    @State var userVM = UserViewModel()
     
     
     
@@ -115,23 +114,23 @@ struct OBPage2: View {
                     Spacer()
                     
                     
-                    Button(action: {
-                        let dateString = ISO8601DateFormatter().string(from: selectedDate)
-                        Task{
-                            await userVM.updateUser(with: ["genre" : selectedGenre, "weight" : selectedWeight, "height" : selectedHeight, "birthDate" : dateString])
+                    Button("SUIVANT") {
+                        Task {
+                            do {
+                                try await loginVM.updateCurrentUser(with: [
+                                    "genre": selectedGenre,
+                                    "weight": selectedWeight,
+                                    "height": selectedHeight,
+                                    "birthDate": ISO8601DateFormatter().string(from: selectedDate)
+                                ])
+                                showNext = true
+                            } catch {
+                                print("Erreur updateUser:", error)
+                            }
                         }
-                        showNext = true
-                        
-                    }, label: {
-                        
-                        
-                        Text("SUIVANT")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundColor(.black)
-                        
-                        
-                    }).customButton()
-                        .padding(.bottom, 60)
+                    }
+                    .customButton()
+                    .padding(.bottom, 60)
                     
                 }
                 
@@ -150,7 +149,8 @@ struct OBPage2: View {
             
         }.navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $showNext) {
-                OBPage1()
+                OBPage3().environment(loginVM)
+                
             }
     }
 }
