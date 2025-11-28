@@ -66,6 +66,7 @@ class LoginViewModel {
             "password": password
         ]
         
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -81,11 +82,17 @@ class LoginViewModel {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data {
                 
-//                let jsonString = String(data: data, encoding: .utf8)
-//                print(jsonString ?? "No JSON")
+                let jsonString = String(data: data, encoding: .utf8)
+                print(jsonString ?? "No JSON")
 
                 do {
-                    let decoded = try JSONDecoder().decode(LoginResponse.self, from: data)
+                    let decoder = JSONDecoder()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy/MM/dd"
+                    decoder.dateDecodingStrategy = .formatted(formatter)
+                    
+                    let decoded = try decoder.decode(LoginResponse.self, from: data)
+
                     DispatchQueue.main.async {
                         self.token = decoded.token
                         self.currentUser = decoded.user
@@ -135,7 +142,7 @@ class LoginViewModel {
         let (data, response) = try await URLSession.shared.data(for: request)
         print(String(data: data, encoding: .utf8) ?? "No data")
 
-        var login = try await login(email: email, password: password)
+        await login(email: email, password: password)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }

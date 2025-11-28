@@ -14,11 +14,13 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if !loginVM.isAuthenticated {
-                LoginView()
+                LoginView().environment(loginVM)
             } else if loginVM.isAuthenticated && loginVM.currentUser?.onboardingDone == true {
                 //LandingPageView()
+
             } else {
-                //OnboardingView()
+                OBPage1().environment(loginVM)
+
             }
 
 
