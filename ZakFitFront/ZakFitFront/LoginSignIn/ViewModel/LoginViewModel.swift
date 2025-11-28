@@ -149,6 +149,31 @@ class LoginViewModel {
         
         
     }
+    
+    func updateCurrentUser(with fields: [String: Any]) async throws {
+        guard let token = token else { throw URLError(.userAuthenticationRequired) }
+        guard let url = URL(string: "http://localhost:8080/user/") else { throw URLError(.badURL) }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try JSONSerialization.data(withJSONObject: fields)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        let decoder = JSONDecoder()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"  // à adapter à ton backend
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        let updatedUser = try decoder.decode(User.self, from: data)
+
+        await MainActor.run {
+            self.currentUser = updatedUser
+        }
+
+    }
+
 }
 
 

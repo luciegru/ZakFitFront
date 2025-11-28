@@ -28,7 +28,7 @@ struct CustomDatePicker: View {
             DatePicker(selection: $selectedDate, displayedComponents: .date) {}
                 .labelsHidden()
                 .contentShape(Rectangle())
-                .opacity(0.11)             // <<< here
+                .opacity(0.11)             
         }
 
     }

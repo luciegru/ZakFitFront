@@ -39,7 +39,7 @@ struct CustomDropdownMenu: View {
             .background(Color.middleGrey)
             .cornerRadius(5)
         }
-        .frame(width: 300, height: 50)
+        .frame(height: 50)
         .background(
             GeometryReader { geo in
                 Color.clear.preference(
