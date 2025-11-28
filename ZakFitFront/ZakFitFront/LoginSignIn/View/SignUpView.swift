@@ -15,8 +15,8 @@ struct SignUpView: View {
     @State var password: String = ""
     @State var passwordConfirmation: String = ""
     @State var response: String = ""
-    @State var loginVM = LoginViewModel()
-    
+    @Environment(LoginViewModel.self) private var loginVM
+
     var body: some View {
         
         NavigationStack{
@@ -106,5 +106,5 @@ struct SignUpView: View {
 
 
 #Preview {
-    SignUpView()
+    SignUpView().environment(LoginViewModel())
 }
