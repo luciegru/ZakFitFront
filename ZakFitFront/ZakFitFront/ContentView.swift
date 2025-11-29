@@ -16,7 +16,7 @@ struct ContentView: View {
             if !loginVM.isAuthenticated {
                 LoginView()
             } else if loginVM.isAuthenticated && loginVM.currentUser?.onboardingDone == true {
-                //LandingPageView()
+                LandingPage()
 
             } else {
                 OBPage1()

@@ -131,6 +131,8 @@ struct OBPage2: View {
                     }
                     .customButton()
                     .padding(.bottom, 60)
+                    .foregroundStyle(Color.black)
+                    .font(Font.system(size: 16, weight: .bold))
                     
                 }
                 

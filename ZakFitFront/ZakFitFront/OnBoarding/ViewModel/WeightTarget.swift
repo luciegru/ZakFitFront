@@ -27,7 +27,7 @@ func WeightTarget(weight: Double, heightcm: Int) -> String {
     case 18.5...24.9:
         return "peux viser le maintien."
         
-    case 25..<29.9:
+    case 25...:
         return "devrais perdre \(abs(roundedDiff)) kg."
         
     default:
