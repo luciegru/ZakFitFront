@@ -9,15 +9,25 @@ import SwiftUI
 
 struct OBPage3: View {
     @Environment(LoginViewModel.self) private var loginVM
+    @State var APObjVM: APObjectiveViewModel = APObjectiveViewModel()
+    @State var WeightObjVM: WeightObjectiveViewModel = WeightObjectiveViewModel()
     
     @State var selectedHealthObjective: String = "Maintient"
     @State var selectedWeight: Double = 0
     @State var selectedInterval: Int = 0
-    @State var selectedIntervalUnit: String = "Jours"
+    @State var selectedIntervalUnit: String = "semaine"
     
     @State private var showNext = false
+    @State var isSelected: Bool = false
     
-    
+    @State var selectedAPObjective: String = "Brûler"
+    @State var selectedAPTime: Int = 0
+    @State var selectedAPSport: String = "sport"
+    @State var selectedAPInterval: String = "jours"
+    @State var selectedCals: Int = 0
+    @State var selectedAPNumber: Int = 0
+    @State var selectedAPStep: Int = 0
+    @State var timeToAdd: Int = 0
     
     
     var body: some View {
@@ -54,12 +64,6 @@ struct OBPage3: View {
                     
                     
                     VStack{
-                        HStack{
-                            Text("Objectif de poids")
-                                .foregroundStyle(Color.white)
-                                .padding(.leading, 20)
-                            Spacer()
-                        }
                         
                         if selectedHealthObjective == "Maintient" {
                             EmptyView()
@@ -81,17 +85,38 @@ struct OBPage3: View {
                     
                     
                     VStack{
-                        HStack{
-                            Text("Date de naissance")
+                        HStack(alignment: .bottom){
+                            
+                            Button(action:{
+                                isSelected.toggle()
+                            }, label:{
+                                ZStack {
+                                    
+                                    if isSelected {
+                                        Image(systemName: "checkmark")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 37, height: 37)
+                                            .foregroundStyle(Color.customBlue)
+                                    }
+                                    
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .stroke(.white, lineWidth: 2)
+                                        .frame(width: 30, height: 30)
+                                }
+                            })
+                            Text("Objectif d'activité physique")
                                 .foregroundStyle(Color.white)
                                 .padding(.leading, 20)
                                 .padding(.bottom,7)
-                            Spacer()
+                        }
+                        if isSelected{
+                            
+                            CustomAPObjectivePicker(selectedAPObjective: $selectedAPObjective, selectedAPTime: $selectedAPTime, selectedAPSport: $selectedAPSport, selectedAPStep: $selectedAPStep, selectedAPInterval: $selectedAPInterval, selectedCals: $selectedCals, selectedAPNumbers: $selectedAPNumber)
+                            
+                            
                         }
                         
-                        HStack{
-                            Spacer()
-                        }.padding(.leading)
                     }
                     
                     Spacer()
@@ -99,12 +124,34 @@ struct OBPage3: View {
                     
                     Spacer()
                     
-                    
                     Button(action: {
-                        Task{
+                        Task {
+                            try await loginVM.updateCurrentUser(with: ["healthObjective": selectedHealthObjective])
+                            
+                            // ✅ Prépare les données AP
+                            let apData = ObjectiveHelper.prepareAPObjectiveData(
+                                objective: selectedAPObjective,
+                                time: selectedAPTime,
+                                number: selectedAPNumber,
+                                interval: selectedAPInterval,
+                                sport: selectedAPSport,
+                                calories: selectedCals
+                            )
+                            try await APObjVM.createAPObjective(with: apData)
+                            
+                            // ✅ Prépare les données Weight
+                            if let weightData = ObjectiveHelper.prepareWeightObjectiveData(
+                                currentWeight: loginVM.currentUser?.weight ?? 0,
+                                healthObjective: selectedHealthObjective,
+                                weightToChange: selectedWeight,
+                                interval: selectedInterval,
+                                intervalUnit: selectedIntervalUnit
+                            ) {
+                                try await WeightObjVM.createWeightObjective(with: weightData)
+                            }
                         }
                         showNext = true
-                        
+
                     }, label: {
                         
                         
@@ -118,21 +165,11 @@ struct OBPage3: View {
                     
                 }.frame(width: 310)
                 
-                VStack{
-                    Text("Tadaaa !  Ton IMC en un temps record !")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.white)
-                        .frame(width: 220)
-                        .multilineTextAlignment(.center)
-                    
-                    Image(.zakPointing)
-                }.offset(x: -120, y: 230)
-                
             }
             
         }.navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $showNext) {
-                OBPage1()
+                OBPage4()
             }
         
         
