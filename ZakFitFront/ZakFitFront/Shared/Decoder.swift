@@ -13,6 +13,7 @@ extension JSONDecoder {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // ✅ important
         decoder.dateDecodingStrategy = .formatted(dateFormatter)
         return decoder
     }

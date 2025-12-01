@@ -12,6 +12,7 @@ struct Registration: Codable {
     var firstName: String
     var email: String
     var password: String
+    var onboardingDone: Bool
     
     
     

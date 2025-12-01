@@ -57,11 +57,12 @@ class WeightObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/WeightObjective/user")
+        guard let url = URL(string: "http://localhost:8080/weightObjective/user")
         else {
             print("mauvais URL")
             
             return }
+//        print("bon token bon url")
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -72,11 +73,14 @@ class WeightObjectiveViewModel{
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
-                //            let jsonString = String(data: data, encoding: .utf8)
-                //            print(jsonString ?? "No JSON")
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedWeightObj = try JSONDecoder.withDateFormatting.decode(WeightObjective.self, from: data)  // ✅
+                    let decodedWeightObj = try JSONDecoder.withDateFormatting.decode(WeightObjective.self, from: data)
+                    
+//                    print(decodedWeightObj)
+                    
                     DispatchQueue.main.async {
                         self.WeightObj = decodedWeightObj
                     }

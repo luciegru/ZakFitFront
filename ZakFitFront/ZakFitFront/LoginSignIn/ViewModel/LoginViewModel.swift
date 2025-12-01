@@ -82,8 +82,8 @@ class LoginViewModel {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data {
                 
-                let jsonString = String(data: data, encoding: .utf8)
-                print(jsonString ?? "No JSON")
+//                let jsonString = String(data: data, encoding: .utf8)
+//                print(jsonString ?? "No JSON")
 
                 do {
                     let decoder = JSONDecoder()
@@ -92,6 +92,7 @@ class LoginViewModel {
                     decoder.dateDecodingStrategy = .formatted(formatter)
                     
                     let decoded = try decoder.decode(LoginResponse.self, from: data)
+                    
 
                     DispatchQueue.main.async {
                         self.token = decoded.token
@@ -120,7 +121,7 @@ class LoginViewModel {
             currentUser = nil
         }
     
-    func createUser(name: String, firstName: String, email: String, password: String) async throws {
+    func createUser(name: String, firstName: String, email: String, password: String, onboardingDone: Bool) async throws {
         guard let url = URL(string: "http://localhost:8080/user") else {
             throw URLError(.badURL)
         }
@@ -134,6 +135,7 @@ class LoginViewModel {
             firstName: firstName,
             email: email,
             password: password,
+            onboardingDone: onboardingDone
         )
 
         let encoder = JSONEncoder()

@@ -70,7 +70,7 @@ struct SignUpView: View {
                         } else {
                             Task {
                                 
-                                try await loginVM.createUser(name: name, firstName: firstname , email: email, password: password)
+                                try await loginVM.createUser(name: name, firstName: firstname , email: email, password: password, onboardingDone: false)
                                 
                                 if let error = loginVM.errorMessage {
                                     response = error

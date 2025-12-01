@@ -14,7 +14,7 @@ struct OBPage5: View {
     @State var userFoodPreferenceVM: UserFoodPreferenceViewModel = UserFoodPreferenceViewModel()
     
     @State var selectedFoodPreferences: [FoodPreference] = []
-    @State private var showNext = false
+    @State var showNext: Bool = false
     
     var body: some View {
         NavigationStack{
@@ -231,8 +231,10 @@ struct OBPage5: View {
                             
                             try await loginVM.updateCurrentUser(with: ["onboardingDone" : true])
                             
-                            showNext = true
-                            
+                            print("✅ Onboarding terminé, valeur: \(loginVM.currentUser?.onboardingDone ?? false)")
+
+
+                                  showNext = true
                         }
                         
                         
@@ -255,11 +257,11 @@ struct OBPage5: View {
             }
             
         }.navigationBarBackButtonHidden()
-            .navigationDestination(isPresented: $showNext) {
-                LandingPage()
-            }
             .task{
                 await foodPreferenceVM.getAllFoodPreference()
+            }
+            .navigationDestination(isPresented: $showNext) {
+                ContentView()
             }
         
         

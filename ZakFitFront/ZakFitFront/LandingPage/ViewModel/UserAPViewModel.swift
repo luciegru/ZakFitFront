@@ -1,15 +1,15 @@
 //
-//  CalObjectiveViewModel.swift
+//  UserAPViewModel.swift
 //  ZakFitFront
 //
-//  Created by Lucie Grunenberger  on 29/11/2025.
+//  Created by Lucie Grunenberger  on 30/11/2025.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class DailyCalObjectiveViewModel{
+class UserAPViewModel{
     
     var token: String? {
         didSet {
@@ -45,10 +45,11 @@ class DailyCalObjectiveViewModel{
         UserDefaults.standard.removeObject(forKey: "authToken")
     }
     
-    var dailyCalObj: DailyCalObjective? = nil
+    var APs: [AP] = []
+    var userAP: [UserAP] = []
 
     
-    func getMyDailyCalObjective() async {
+    func getMyAP(userId: UUID) async {
         
         
         guard let token = token
@@ -57,15 +58,11 @@ class DailyCalObjectiveViewModel{
             
             return }
         
-        
-        guard let url = URL(string: "http://localhost:8080/DailyCalObjective/user")
+        guard let url = URL(string: "http://localhost:8080/userAP/userId/\(userId)")
         else {
             print("mauvais URL")
             
             return }
-        
-//        print("bon token bon url")
-
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -76,14 +73,15 @@ class DailyCalObjectiveViewModel{
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
-//                            let jsonString = String(data: data, encoding: .utf8)
-//                            print(jsonString ?? "No JSON")
+                            let jsonString = String(data: data, encoding: .utf8)
+                            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedDailyCalObj = try JSONDecoder.withDateFormatting.decode(DailyCalObjective.self, from: data)
+                    let decodedAP = try JSONDecoder.withDateFormatting.decode([AP].self, from: data)
                     DispatchQueue.main.async {
-                        self.dailyCalObj = decodedDailyCalObj
-//                        print(decodedDailyCalObj)
+                        self.APs = decodedAP
+                        
+                        print("decoded AP = \(decodedAP)")
                     }
                 }
                 catch {
@@ -97,8 +95,7 @@ class DailyCalObjectiveViewModel{
         
     }
     
-    
-    func createDailyCalObjective(with fields: [String: Any]) async {
+    func createUserAP(with fields: [String: Any]) async {
         
         
         guard let token = token
@@ -107,12 +104,11 @@ class DailyCalObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/DailyCalObjective")
+        guard let url = URL(string: "http://localhost:8080/userAP")
         else {
             print("mauvais URL")
             
             return }
-        
         
 
         
@@ -123,6 +119,7 @@ class DailyCalObjectiveViewModel{
         
         request.httpBody = try? JSONSerialization.data(withJSONObject: fields)
         
+
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
@@ -131,16 +128,14 @@ class DailyCalObjectiveViewModel{
             }
             if let data = data {
                 
-//                let jsonString = String(data: data, encoding: .utf8)
-//                print(jsonString ?? "No JSON")
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
 
                 do {
                     
-                    let newDailyCalObj = try JSONDecoder.withDateFormatting.decode(DailyCalObjective.self, from: data)  // ✅
+                    let newUserAP = try JSONDecoder.withDateFormatting.decode(UserAP.self, from: data)
                     DispatchQueue.main.async {
-                        self.dailyCalObj = newDailyCalObj
-                        
-                        print(newDailyCalObj)
+                        self.userAP.append(newUserAP)
                     }
                 } catch {
                     print("Erreur décodage update:", error)
@@ -152,50 +147,5 @@ class DailyCalObjectiveViewModel{
         
         
     }
-    
-    func updateDailyCalObjective(with fields: [String: Any], DailyCalObjId: UUID) async {
-        
-        guard let token = token
-        else {
-            print("mauvais token")
-            
-            return }
-        
-        guard let url = URL(string: "http://localhost:8080/DailyCalObjective/\(DailyCalObjId)")
-        else {
-            print("mauvais URL")
-            
-            return }
-
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-                
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error {
-                print("Erreur update:", error)
-                return
-            }
-            if let data = data {
-                do {
-                    let updatedDailyCalObj = try JSONDecoder().decode(DailyCalObjective.self, from: data)
-                    DispatchQueue.main.async {
-                        self.dailyCalObj = updatedDailyCalObj
-                    }
-                } catch {
-                    print("Erreur décodage update:", error)
-                }
-            }
-        }.resume()
-
-        
-        
-        
-    }
-
-
    
 }
