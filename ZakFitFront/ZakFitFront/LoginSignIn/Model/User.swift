@@ -19,5 +19,5 @@ struct User: Codable, Identifiable, Equatable {
     var picture: String?
     var birthDate: Date?
     var healthObjective: String?
-    var onboardingDone:Bool
+    var onboardingDone: Bool
 }
