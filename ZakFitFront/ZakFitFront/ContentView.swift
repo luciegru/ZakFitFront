@@ -16,6 +16,7 @@ struct ContentView: View {
     @State var mealVM = MealViewModel()
     @State var userAPVM = UserAPViewModel()
     @State var APObjectiveVM = APObjectiveViewModel()
+    @State var userWeightVM = UserWeightViewModel()
 
     
     var body: some View {
@@ -44,8 +45,7 @@ struct ContentView: View {
                 VStack{
                     Spacer()
                     CustomTabBar(selectedTab: $selectedTab)
-                        .frame(height: 100) // ou la hauteur que tu veux
-                        .padding(.bottom, 20)
+                        .frame(height: 110) 
                 }
                 
             }.environment(loginVM)
@@ -54,6 +54,7 @@ struct ContentView: View {
                 .environment(mealVM)
                 .environment(userAPVM)
                 .environment(APObjectiveVM)
+                .environment(userWeightVM)
                 .navigationBarBackButtonHidden()
         } else {
             OBPage1()

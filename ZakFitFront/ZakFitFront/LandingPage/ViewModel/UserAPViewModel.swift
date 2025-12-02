@@ -74,14 +74,14 @@ class UserAPViewModel{
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
                             let jsonString = String(data: data, encoding: .utf8)
-                            print(jsonString ?? "No JSON")
+//                            print(jsonString ?? "No JSON")
                 
                 do{
                     let decodedAP = try JSONDecoder.withDateFormatting.decode([AP].self, from: data)
                     DispatchQueue.main.async {
                         self.APs = decodedAP
                         
-                        print("decoded AP = \(decodedAP)")
+//                        print("decoded AP = \(decodedAP)")
                     }
                 }
                 catch {

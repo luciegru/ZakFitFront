@@ -15,6 +15,8 @@ struct CalGraph: View {
     
     var body: some View {
         let APNeeded = userAPViewModel.APs.filter { $0.date.isInSameMonth(as: selectedMonth) }
+        let normalized = APNeeded.map { (Calendar.current.startOfDay(for: $0.date), $0.burnedCal) }
+            .sorted { $0.0 < $1.0 }
 
         VStack(alignment: .leading, spacing: 8) {
             Text("Calories brûlées chaque jour ce mois-ci")
@@ -35,36 +37,32 @@ struct CalGraph: View {
                         .foregroundStyle(.white)
                 }
                 
-                ForEach(APNeeded) { AP in
+                ForEach(normalized, id: \.0) { point in
                     LineMark(
-                        x: .value("Jours", AP.date),
-                        y: .value("Calories brûlées", AP.burnedCal)
+                        x: .value("Jours", point.0),
+                        y: .value("Calories brûlées", point.1)
                     )
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [
-                                Color(.customYellow),
-                                Color(.customBlue),
-                                Color(.customPurple),
-                                Color(.customPink)
-                            ],
+                            colors: [.customYellow, .customBlue, .customPurple, .customPink],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                    .interpolationMethod(.catmullRom) // ⭐ Seulement sur LineMark
+                    .interpolationMethod(.catmullRom)
                 }
+
             }
             .frame(height: 200)
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { _ in
-                    AxisValueLabel(format: .dateTime.day())
-                        .foregroundStyle(.white)
+                AxisMarks(values: .stride(by: .day)) { value in
+                    AxisValueLabel(format: .dateTime.day(.defaultDigits))
                     AxisGridLine()
                         .foregroundStyle(.white.opacity(0.2))
                 }
             }
+
             .chartYAxis {
                 AxisMarks { _ in
                     AxisValueLabel()

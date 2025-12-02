@@ -1,15 +1,15 @@
 //
-//  APObjectiveVM.swift
+//  MealFoodViewModel.swift
 //  ZakFitFront
 //
-//  Created by Lucie Grunenberger  on 29/11/2025.
+//  Created by Lucie Grunenberger  on 01/12/2025.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class APObjectiveViewModel{
+class MealFoodViewModel{
     
     var token: String? {
         didSet {
@@ -45,10 +45,11 @@ class APObjectiveViewModel{
         UserDefaults.standard.removeObject(forKey: "authToken")
     }
     
-    var APObj: APObjective? = nil
+    var foods: [Food] = []
+    var mealFood: [MealFood] = []
 
     
-    func getMyAPObjective() async {
+    func getFoodByMeal(mealId: UUID) async {
         
         
         guard let token = token
@@ -57,7 +58,7 @@ class APObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/APObjective/user")
+        guard let url = URL(string: "http://localhost:8080/mealFood/mealId/\(mealId)")
         else {
             print("mauvais URL")
             
@@ -72,13 +73,15 @@ class APObjectiveViewModel{
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
-                //            let jsonString = String(data: data, encoding: .utf8)
-                //            print(jsonString ?? "No JSON")
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedAPObj = try JSONDecoder.withDateFormatting.decode(APObjective.self, from: data)  // ✅
+                    let decodedFoods = try JSONDecoder.withDateFormatting.decode([Food].self, from: data)
                     DispatchQueue.main.async {
-                        self.APObj = decodedAPObj
+                        self.foods = decodedFoods
+                        
+//                        print("decoded AP = \(decodedAP)")
                     }
                 }
                 catch {
@@ -92,10 +95,23 @@ class APObjectiveViewModel{
         
     }
     
-    
-    func createAPObjective(with fields: [String: Any]) async {
+    func fetchFoodsForMeal(mealId: UUID) async throws -> [Food] {
+        guard let token = token else { return [] }
+        guard let url = URL(string: "http://localhost:8080/mealFood/mealId/\(mealId)") else { return [] }
         
-//        print("je rentre dans la fonction")
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let decoded = try JSONDecoder.withDateFormatting.decode([Food].self, from: data)
+        return decoded
+    }
+
+    
+    func createMealFood(with fields: [String: Any]) async {
+        
         
         guard let token = token
         else {
@@ -103,13 +119,12 @@ class APObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/APObjective")
+        guard let url = URL(string: "http://localhost:8080/mealFood/")
         else {
             print("mauvais URL")
             
             return }
         
-//        print("bon token bon url")
 
         
         var request = URLRequest(url: url)
@@ -120,7 +135,6 @@ class APObjectiveViewModel{
         request.httpBody = try? JSONSerialization.data(withJSONObject: fields)
         
 
-//        print("decode")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
@@ -134,9 +148,9 @@ class APObjectiveViewModel{
 
                 do {
                     
-                    let newAPObj = try JSONDecoder.withDateFormatting.decode(APObjective.self, from: data)
+                    let newMealFood = try JSONDecoder.withDateFormatting.decode(MealFood.self, from: data)
                     DispatchQueue.main.async {
-                        self.APObj = newAPObj
+                        self.mealFood.append(newMealFood)
                     }
                 } catch {
                     print("Erreur décodage update:", error)
@@ -148,50 +162,5 @@ class APObjectiveViewModel{
         
         
     }
-    
-    func updateAPObjectif(with fields: [String: Any], APId: UUID) async {
-        
-        guard let token = token
-        else {
-            print("mauvais token")
-            
-            return }
-        
-        guard let url = URL(string: "http://localhost:8080/APObjective/\(APId)")
-        else {
-            print("mauvais URL")
-            
-            return }
-
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-                
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error {
-                print("Erreur update:", error)
-                return
-            }
-            if let data = data {
-                do {
-                    let updatedAPObj = try JSONDecoder().decode(APObjective.self, from: data)
-                    DispatchQueue.main.async {
-                        self.APObj = updatedAPObj
-                    }
-                } catch {
-                    print("Erreur décodage update:", error)
-                }
-            }
-        }.resume()
-
-        
-        
-        
-    }
-
-
    
 }
