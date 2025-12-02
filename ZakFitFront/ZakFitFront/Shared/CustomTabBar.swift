@@ -16,18 +16,17 @@ struct CustomTabBar: View {
                 .resizable()
                 .scaledToFit()
                 .ignoresSafeArea(edges: .bottom)
-                .frame(width: 352)
-                .padding(.bottom, 40)
+                .frame(width: 360)
 
             HStack(spacing: 40) {
                 tabItem(.calendrier, active: "Calendar_active", inactive: "Calendar_inactive")
-                    .offset(x: 0, y: -10)
+                    .offset(x: -25, y: 10)
                 tabItem(.dashboard, active: "Dashboard_active", inactive: "Dashboard_inactive")
-                    .offset(x: 0, y: -10)
+                    .offset(x: -10, y: 10)
                 tabItem(.profil, active: "Profil_active", inactive: "Profil_inactive")
-                    .offset(x: 0, y: -10)
+                    .offset(x: 10, y: 10)
                 tabItem(.historique, active: "History_active", inactive: "History_inactive")
-                    .offset(x: 0, y: -10)
+                    .offset(x: 25, y: 10)
             }
             .padding(.bottom, 20)
         }

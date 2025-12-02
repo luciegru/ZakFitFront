@@ -43,20 +43,6 @@ struct LegendItem: View {
     }
 }
 
-struct WeekDetailView: View {
-    let selectedDate: Date
-    
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            Text("Détail de la semaine")
-                .font(.title)
-                .foregroundColor(.white)
-        }
-        .navigationTitle("Semaine")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
 
 
 

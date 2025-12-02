@@ -1,15 +1,15 @@
 //
-//  APObjectiveVM.swift
+//  UserWeightViewModel.swift
 //  ZakFitFront
 //
-//  Created by Lucie Grunenberger  on 29/11/2025.
+//  Created by Lucie Grunenberger  on 02/12/2025.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class APObjectiveViewModel{
+class UserWeightViewModel{
     
     var token: String? {
         didSet {
@@ -45,10 +45,11 @@ class APObjectiveViewModel{
         UserDefaults.standard.removeObject(forKey: "authToken")
     }
     
-    var APObj: APObjective? = nil
+    var weight: UserWeight? = nil
+    var weightList: [UserWeight] = []
 
     
-    func getMyAPObjective() async {
+    func getMyWeight() async {
         
         
         guard let token = token
@@ -57,7 +58,7 @@ class APObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/APObjective/user")
+        guard let url = URL(string: "http://localhost:8080/userWeight/user")
         else {
             print("mauvais URL")
             
@@ -76,9 +77,9 @@ class APObjectiveViewModel{
                 //            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedAPObj = try JSONDecoder.withDateFormatting.decode(APObjective.self, from: data)  // ✅
+                    let decodedWeight = try JSONDecoder.withDateFormatting.decode([UserWeight].self, from: data)
                     DispatchQueue.main.async {
-                        self.APObj = decodedAPObj
+                        self.weightList = decodedWeight
                     }
                 }
                 catch {
@@ -93,9 +94,8 @@ class APObjectiveViewModel{
     }
     
     
-    func createAPObjective(with fields: [String: Any]) async {
+    func createWeight(with fields: [String: Any]) async {
         
-//        print("je rentre dans la fonction")
         
         guard let token = token
         else {
@@ -103,13 +103,12 @@ class APObjectiveViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/APObjective")
+        guard let url = URL(string: "http://localhost:8080/userWeight/")
         else {
             print("mauvais URL")
             
             return }
         
-//        print("bon token bon url")
 
         
         var request = URLRequest(url: url)
@@ -120,7 +119,6 @@ class APObjectiveViewModel{
         request.httpBody = try? JSONSerialization.data(withJSONObject: fields)
         
 
-//        print("decode")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
@@ -128,59 +126,17 @@ class APObjectiveViewModel{
                 return
             }
             if let data = data {
-                
+//
 //                            let jsonString = String(data: data, encoding: .utf8)
 //                            print(jsonString ?? "No JSON")
 
                 do {
-                    
-                    let newAPObj = try JSONDecoder.withDateFormatting.decode(APObjective.self, from: data)
+                    let decodedWeight = try JSONDecoder.withDateFormatting.decode(UserWeight.self, from: data)
                     DispatchQueue.main.async {
-                        self.APObj = newAPObj
+                        self.weightList.append(decodedWeight)
+                        self.weight = decodedWeight
                     }
-                } catch {
-                    print("Erreur décodage update:", error)
-                }
-            }
-        }.resume()
-
-        
-        
-        
-    }
-    
-    func updateAPObjectif(with fields: [String: Any], APId: UUID) async {
-        
-        guard let token = token
-        else {
-            print("mauvais token")
-            
-            return }
-        
-        guard let url = URL(string: "http://localhost:8080/APObjective/\(APId)")
-        else {
-            print("mauvais URL")
-            
-            return }
-
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error {
-                print("Erreur update:", error)
-                return
-            }
-            if let data = data {
-                do {
-                    let updatedAPObj = try JSONDecoder().decode(APObjective.self, from: data)
-                    DispatchQueue.main.async {
-                        self.APObj = updatedAPObj
-                    }
                 } catch {
                     print("Erreur décodage update:", error)
                 }
@@ -191,7 +147,7 @@ class APObjectiveViewModel{
         
         
     }
-
 
    
 }
+

@@ -13,7 +13,6 @@ struct CalendarMonthView: View {
     var onMonthChange: ((Date) -> Void)? = nil
 
     
-    // Tes ViewModels
     @Environment(UserAPViewModel.self) private var userAPVM
     @Environment(MealViewModel.self) private var mealVM
     @Environment(LoginViewModel.self) private var loginVM

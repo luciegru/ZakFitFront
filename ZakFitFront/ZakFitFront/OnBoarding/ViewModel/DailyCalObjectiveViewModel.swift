@@ -140,7 +140,7 @@ class DailyCalObjectiveViewModel{
                     DispatchQueue.main.async {
                         self.dailyCalObj = newDailyCalObj
                         
-                        print(newDailyCalObj)
+//                        print(newDailyCalObj)
                     }
                 } catch {
                     print("Erreur décodage update:", error)

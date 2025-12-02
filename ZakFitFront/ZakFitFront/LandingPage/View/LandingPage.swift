@@ -10,15 +10,18 @@ import SwiftUI
 struct LandingPage: View {
     @State var selectedDateInterval: String = "Mois"
     @State private var selectedDate = Date()
-    @State private var navigateToWeek = false
+    @State private var navigateToWeekFromCalendar = false
+    @State private var navigateToWeekFromDropdown = false
     @State private var selectedMonth: Date = Date()
+    
     
     @Environment(LoginViewModel.self) private var loginVM
     @Environment(APObjectiveViewModel.self) private var APObjectiveVM
-    @Environment(DailyCalObjectiveViewModel.self) var dailyCalObjective
-    @Environment(WeightObjectiveViewModel.self) var weightObjective
+    @Environment(DailyCalObjectiveViewModel.self) var dailyCalObjectiveVM
     @Environment(MealViewModel.self) var mealVM
     @Environment(UserAPViewModel.self) var userAPVM
+    @Environment(UserWeightViewModel.self) var userWeightVM
+    @Environment(WeightObjectiveViewModel.self) var weightObjectiveVM
 
     var body: some View {
         NavigationStack {
@@ -52,7 +55,7 @@ struct LandingPage: View {
                                         
                     CalendarMonthView(
                         selectedDate: $selectedDate,
-                        onDoubleTap: { navigateToWeek = true },
+                        onDoubleTap: { navigateToWeekFromCalendar = true },
                         onMonthChange: { newMonth in
                             selectedMonth = newMonth
                         }
@@ -64,7 +67,7 @@ struct LandingPage: View {
                     VStack{
                         ScrollView{
                             
-                            DailyTips().environment(loginVM).environment(userAPVM).environment(APObjectiveVM).environment(dailyCalObjective).environment(weightObjective).environment(mealVM)
+                            DailyTips().environment(loginVM).environment(userAPVM).environment(APObjectiveVM).environment(dailyCalObjectiveVM).environment(weightObjectiveVM).environment(mealVM)
                             
                             CalGraph(selectedMonth: selectedMonth)
                                 .environment(userAPVM)
@@ -138,13 +141,39 @@ struct LandingPage: View {
                 }
                 .padding(.vertical, 50)
             }
-            .navigationDestination(isPresented: $navigateToWeek) {
-                WeekDetailView(selectedDate: selectedDate)
+            .navigationDestination(isPresented: $navigateToWeekFromCalendar) {
+                LandingPageWeek(selectedDate: selectedDate)
+                    .environment(mealVM)
+                    .environment(userAPVM)
+                    .environment(loginVM)
+                    .environment(dailyCalObjectiveVM)
+                    .environment(APObjectiveVM)
+                    .environment(userWeightVM)
+                    .environment(weightObjectiveVM)
             }
+            .navigationDestination(isPresented: $navigateToWeekFromDropdown) {
+                LandingPageWeek(selectedDate: Date())  // Date actuelle
+                    .environment(mealVM)
+                    .environment(userAPVM)
+                    .environment(loginVM)
+                    .environment(dailyCalObjectiveVM)
+                    .environment(APObjectiveVM)
+                    .environment(userWeightVM)
+                    .environment(weightObjectiveVM)
+            }
+            .onChange(of: selectedDateInterval) { oldValue, newValue in
+                if newValue.lowercased() == "semaine" {
+                    navigateToWeekFromDropdown = true  // ✅
+                }
+            }
+
+            .navigationBarBackButtonHidden()
+            
+
             .task {
                 await APObjectiveVM.getMyAPObjective()
-                try? await dailyCalObjective.getMyDailyCalObjective()
-                try? await weightObjective.getMyWeightObjective()
+                try? await dailyCalObjectiveVM.getMyDailyCalObjective()
+                try? await weightObjectiveVM.getMyWeightObjective()
                 if let userId = loginVM.currentUser?.id{
                     
                 try? await userAPVM.getMyAP(userId: userId)
@@ -162,5 +191,14 @@ struct LandingPage: View {
 
 
 #Preview {
-    LandingPage().environment(LoginViewModel()).environment(APObjectiveViewModel()).environment(DailyCalObjectiveViewModel()).environment(WeightObjectiveViewModel()).environment(MealViewModel()).environment(UserAPViewModel())
+    LandingPage()
+        .environment(LoginViewModel())
+        .environment(APObjectiveViewModel())
+        .environment(DailyCalObjectiveViewModel())
+        .environment(WeightObjectiveViewModel())
+        .environment(MealViewModel())
+        .environment(UserAPViewModel())
+        .environment(MealViewModel())
+        .environment(UserWeightViewModel())
+        .environment(WeightObjectiveViewModel())
 }

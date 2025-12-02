@@ -67,7 +67,6 @@ struct DailyTips: View {
         return (actualValue, targetValue, objectiveText, true)
     }
     
-    // MARK: - Objectif Calories (consommées)
     private var calProgress: (actual: Int, target: Int, text: String, show: Bool) {
         guard let calObj = calObjVM.dailyCalObj else {
             return (0, 2000, "Consommer 2000 Cal aujourd'hui", true)
@@ -91,14 +90,14 @@ struct DailyTips: View {
         guard let user = loginVM.currentUser,
               user.healthObjective?.lowercased() != "maintien",
               let weightObj = weightObjVM.WeightObj,
-              let currentWeight = user.weight,  // ⭐ Unwrap
-              let targetWeight = weightObj.targetWeight,  // ⭐ Unwrap
-              let endDate = weightObj.endDate  // ⭐ Unwrap
+              let currentWeight = user.weight,
+              let targetWeight = weightObj.targetWeight,
+              let endDate = weightObj.endDate
         else {
             return (0, 0, "", false)
         }
         
-        let startWeight = currentWeight // Ou stocke le poids de départ ailleurs si tu veux
+        let startWeight = currentWeight
         
         // Calcul de la progression
         let totalToLose = abs(startWeight - targetWeight)
