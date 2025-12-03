@@ -19,8 +19,12 @@ struct LandingPageWeek: View {
     @Environment(APObjectiveViewModel.self) var APObjectiveVM
     @Environment(UserWeightViewModel.self) var userWeightVM
     @Environment(WeightObjectiveViewModel.self) var weightObjectiveVM
+    @Environment(FoodViewModel.self) var foodVM
+    @Environment(APViewModel.self) var APVM
     @State var selectedOption = "semaine"
     @State private var navigateToMonth: Bool = false
+    @State private var showingMealSheet = false
+    @State private var showingAPSheet = false
 
     
     @State var mealFoodVM: MealFoodViewModel = MealFoodViewModel()
@@ -123,7 +127,9 @@ struct LandingPageWeek: View {
                             HStack{
                                 Spacer()
                                 
-                                Button(action: {}, label:{
+                                Button(action: {
+                                    showingMealSheet.toggle()
+                                }, label:{
                                     HStack{
                                         Text("Modifier mes repas")
                                             .foregroundStyle(Color(.white))
@@ -135,7 +141,20 @@ struct LandingPageWeek: View {
                                     }
                                 })
                             }.padding(.trailing, 30)
-                            
+                                .sheet(isPresented: $showingMealSheet, onDismiss: {
+                                    Task {
+                                        await mealVM.getMyMeal()
+                                        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconde
+                                    }
+                                }) {
+                                    MealSheet()
+                                        .environment(mealVM)
+                                        .environment(foodVM)
+                                        .environment(mealFoodVM)
+                                }
+
+
+
                             MealScrollView(selectedDay: selectedDay).environment(mealVM).environment(mealFoodVM)
                             
                             //Daily CalObj
@@ -272,7 +291,9 @@ struct LandingPageWeek: View {
                                 
                                 Spacer()
                                 
-                                Button(action: {}, label:{
+                                Button(action: {
+                                    showingAPSheet.toggle()
+                                }, label:{
                                     HStack{
                                         Text("Modifier mes activités physiques")
                                             .foregroundStyle(Color(.white))
@@ -282,7 +303,20 @@ struct LandingPageWeek: View {
                                             .foregroundStyle(Color(.white))
                                         
                                     }
-                                })
+                                }).sheet(isPresented: $showingAPSheet, onDismiss: {
+                                    Task {
+                                        if let userId = loginVM.currentUser?.id {
+                                            await userAPVM.getMyAP(userId: userId)
+                                            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconde
+                                        }
+                                    }
+                                }) {
+                                    APSheet()
+                                        .environment(loginVM)
+                                        .environment(userAPVM)
+                                        .environment(APVM)
+                                }
+
                             }.padding(30)
                             
                             VStack{
@@ -354,18 +388,23 @@ struct LandingPageWeek: View {
             }
             .navigationBarHidden(true)
             .task {
-                //            await APObjectiveVM.getMyAPObjective()
+                print("🔄 Chargement des données Week...")
+                
                 try? await dailyCalObjectiveVM.getMyDailyCalObjective()
                 try? await weightObjectiveVM.getMyWeightObjective()
-                try? await mealVM.getMyMeal()
                 
-                if let userId = loginVM.currentUser?.id{
-                    
-                    try? await userAPVM.getMyAP(userId: userId)
+                if let userId = loginVM.currentUser?.id {
+                    await mealVM.getMyMeal()
+                    await userAPVM.getMyAP(userId: userId)
                     try? await userWeightVM.getMyWeight()
                     
+                    // ✅ ATTENDRE que les requêtes callback finissent
+                    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde
                 }
                 
+                print("✅ Données Week chargées:")
+                print("   - Meals:", mealVM.mealList.count)
+                print("   - APs:", userAPVM.APs.count)
             }
             .navigationDestination(isPresented: $navigateToMonth) {
                 LandingPage()
@@ -400,4 +439,6 @@ struct LandingPageWeek: View {
         .environment(APObjectiveViewModel())
         .environment(UserWeightViewModel())
         .environment(WeightObjectiveViewModel())
+        .environment(FoodViewModel())
+        .environment(APViewModel())
 }

@@ -9,12 +9,13 @@ import Foundation
 
 struct Food: Codable, Identifiable, Equatable {
     let id: UUID
-    let foodCategory: UUID
+    let foodCategory: FoodCategoryRes
     let name: String
     let cal: Int
     let carb: Int
     let lip: Int
     let prot: Int
     let unit: String
-    let unitWeightG: Int?
+    let unitWeightG: Double?
 }
+

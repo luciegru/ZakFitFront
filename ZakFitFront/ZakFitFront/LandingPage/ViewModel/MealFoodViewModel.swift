@@ -97,7 +97,9 @@ class MealFoodViewModel{
     
     func fetchFoodsForMeal(mealId: UUID) async throws -> [Food] {
         guard let token = token else { return [] }
-        guard let url = URL(string: "http://localhost:8080/mealFood/mealId/\(mealId)") else { return [] }
+        
+        let urlString = "http://localhost:8080/mealFood/mealId/\(mealId)"
+        guard let url = URL(string: urlString) else { return [] }
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -105,8 +107,16 @@ class MealFoodViewModel{
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let decoded = try JSONDecoder.withDateFormatting.decode([Food].self, from: data)
-        return decoded
+        
+        let jsonString = String(data: data, encoding: .utf8)
+//        print("📥 Réponse fetchFoodsForMeal:", jsonString ?? "No data")
+        
+        // ✅ Decode avec le bon modèle
+        let decodedDTO = try JSONDecoder().decode([FoodResponseFromMeal].self, from: data)
+        let foods = decodedDTO.map { $0.toFood() }
+        
+//        print("✅ Foods décodés:", foods.map { $0.name })
+        return foods
     }
 
     
@@ -143,12 +153,13 @@ class MealFoodViewModel{
             }
             if let data = data {
                 
-//                            let jsonString = String(data: data, encoding: .utf8)
-//                            print(jsonString ?? "No JSON")
+                            let jsonString = String(data: data, encoding: .utf8)
+                            print(jsonString ?? "No JSON")
 
                 do {
                     
-                    let newMealFood = try JSONDecoder.withDateFormatting.decode(MealFood.self, from: data)
+                    let decoder = JSONDecoder()
+                    let newMealFood = try decoder.decode(MealFood.self, from: data)
                     DispatchQueue.main.async {
                         self.mealFood.append(newMealFood)
                     }
@@ -164,3 +175,30 @@ class MealFoodViewModel{
     }
    
 }
+
+struct FoodResponseFromMeal: Codable {
+    let id: UUID
+    let foodCategory: UUID  // ✅ Juste l'UUID, pas l'objet complet
+    let name: String
+    let cal: Int
+    let carb: Int
+    let lip: Int
+    let prot: Int
+    let unit: String
+    
+    // Convertir vers Food
+    func toFood() -> Food {
+        Food(
+            id: id,
+            foodCategory: FoodCategoryRes(id: foodCategory), // Crée un objet minimal
+            name: name,
+            cal: cal,
+            carb: carb,
+            lip: lip,
+            prot: prot,
+            unit: unit,
+            unitWeightG: nil
+        )
+    }
+}
+

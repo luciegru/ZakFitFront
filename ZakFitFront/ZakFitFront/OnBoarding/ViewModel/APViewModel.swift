@@ -1,15 +1,15 @@
 //
-//  MealViewModel.swift
+//  APViewModel.swift
 //  ZakFitFront
 //
-//  Created by Lucie Grunenberger  on 30/11/2025.
+//  Created by Lucie Grunenberger  on 03/12/2025.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class MealViewModel{
+class APViewModel{
     
     var token: String? {
         didSet {
@@ -45,11 +45,11 @@ class MealViewModel{
         UserDefaults.standard.removeObject(forKey: "authToken")
     }
     
-    var meal: Meal? = nil
-    var mealList: [Meal] = []
+    var APhysic: AP? = nil
+    var APList: [AP] = []
 
     
-    func getMyMeal() async {
+    func getAPById(APId: UUID) async {
         
         
         guard let token = token
@@ -58,7 +58,7 @@ class MealViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/meal/user")
+        guard let url = URL(string: "http://localhost:8080/AP/\(APId)")
         else {
             print("mauvais URL")
             
@@ -77,9 +77,9 @@ class MealViewModel{
                 //            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedMeal = try JSONDecoder.withDateFormatting.decode([Meal].self, from: data)
+                    let decodedAP = try JSONDecoder.withDateFormatting.decode(AP.self, from: data)
                     DispatchQueue.main.async {
-                        self.mealList = decodedMeal
+                        self.APhysic = decodedAP
                     }
                 }
                 catch {
@@ -94,8 +94,9 @@ class MealViewModel{
     }
     
     
-    func createMeal(with fields: [String: Any]) async {
+    func createAP(with fields: [String: Any]) async {
         
+//        print("je rentre dans la fonction")
         
         guard let token = token
         else {
@@ -103,12 +104,13 @@ class MealViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/meal")
+        guard let url = URL(string: "http://localhost:8080/AP")
         else {
             print("mauvais URL")
             
             return }
         
+//        print("bon token bon url")
 
         
         var request = URLRequest(url: url)
@@ -119,6 +121,7 @@ class MealViewModel{
         request.httpBody = try? JSONSerialization.data(withJSONObject: fields)
         
 
+//        print("decode")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
@@ -126,17 +129,18 @@ class MealViewModel{
                 return
             }
             if let data = data {
-//
-                            let jsonString = String(data: data, encoding: .utf8)
-                            print(jsonString ?? "No JSON")
+//                
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
 
                 do {
-                    let decodedMeal = try JSONDecoder.withDateFormatting.decode(Meal.self, from: data)
+                    
+                    let newAP = try JSONDecoder.withDateFormatting.decode(AP.self, from: data)
                     DispatchQueue.main.async {
-                        self.mealList.append(decodedMeal)
-                        self.meal = decodedMeal
+                        self.APhysic = newAP
+                        
+                        print(newAP)
                     }
-                
                 } catch {
                     print("Erreur décodage update:", error)
                 }
@@ -147,7 +151,8 @@ class MealViewModel{
         
         
     }
+    
+
 
    
 }
-

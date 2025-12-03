@@ -87,6 +87,7 @@ struct MealCard: View {
         .task(id: selectedDay) {
             if let loaded = try? await foodVM.fetchFoodsForMeal(mealId: meal.id) {
                 foods = loaded
+            } else {
             }
         }
     }
