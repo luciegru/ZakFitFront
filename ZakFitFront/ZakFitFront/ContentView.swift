@@ -17,6 +17,8 @@ struct ContentView: View {
     @State var userAPVM = UserAPViewModel()
     @State var APObjectiveVM = APObjectiveViewModel()
     @State var userWeightVM = UserWeightViewModel()
+    @State var foodVM = FoodViewModel()
+    @State var APVM = APViewModel()
 
     
     var body: some View {
@@ -55,6 +57,8 @@ struct ContentView: View {
                 .environment(userAPVM)
                 .environment(APObjectiveVM)
                 .environment(userWeightVM)
+                .environment(foodVM)
+                .environment(APVM)
                 .navigationBarBackButtonHidden()
         } else {
             OBPage1()
@@ -74,4 +78,5 @@ struct ContentView: View {
         .environment(MealViewModel())
         .environment(UserViewModel())
         .environment(APObjectiveViewModel())
+        .environment(APViewModel())
 }

@@ -13,6 +13,9 @@ struct LandingPage: View {
     @State private var navigateToWeekFromCalendar = false
     @State private var navigateToWeekFromDropdown = false
     @State private var selectedMonth: Date = Date()
+    @State private var dataLoaded = false
+    @State private var calendarRefreshID = UUID()
+
     
     
     @Environment(LoginViewModel.self) private var loginVM
@@ -22,6 +25,8 @@ struct LandingPage: View {
     @Environment(UserAPViewModel.self) var userAPVM
     @Environment(UserWeightViewModel.self) var userWeightVM
     @Environment(WeightObjectiveViewModel.self) var weightObjectiveVM
+    @Environment(FoodViewModel.self) var foodVM
+    @Environment(APViewModel.self) var APVM
 
     var body: some View {
         NavigationStack {
@@ -38,7 +43,6 @@ struct LandingPage: View {
                         Spacer(minLength: 151)
                         
                         Button(action: {}, label: {
-                            
                             AsyncImage(url: URL(string: loginVM.currentUser?.picture ?? "")) { image in
                                 image
                                     .resizable()
@@ -52,22 +56,37 @@ struct LandingPage: View {
                         })
                     }
                     .padding(.horizontal, 20)
-                                        
-                    CalendarMonthView(
-                        selectedDate: $selectedDate,
-                        onDoubleTap: { navigateToWeekFromCalendar = true },
-                        onMonthChange: { newMonth in
-                            selectedMonth = newMonth
-                        }
-                    )
-                    .environment(mealVM)
-                    .environment(userAPVM)
-                    .environment(loginVM)
+                    
+                    // ✅ Affiche le calendrier seulement quand les données sont chargées
+                    if dataLoaded {
+                        CalendarMonthView(
+                            selectedDate: $selectedDate,
+                            onDoubleTap: { navigateToWeekFromCalendar = true },
+                            onMonthChange: { newMonth in
+                                selectedMonth = newMonth
+                            }
+                        )
+                        .environment(mealVM)
+                        .environment(userAPVM)
+                        .environment(loginVM)
+                        .id(dataLoaded)  // ✅ Force le refresh
+                    } else {
+                        // Loader pendant le chargement
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.5)
+                            .frame(height: 300)
+                    }
 
-                    VStack{
-                        ScrollView{
-                            
-                            DailyTips().environment(loginVM).environment(userAPVM).environment(APObjectiveVM).environment(dailyCalObjectiveVM).environment(weightObjectiveVM).environment(mealVM)
+                    VStack {
+                        ScrollView {
+                            DailyTips()
+                                .environment(loginVM)
+                                .environment(userAPVM)
+                                .environment(APObjectiveVM)
+                                .environment(dailyCalObjectiveVM)
+                                .environment(weightObjectiveVM)
+                                .environment(mealVM)
                             
                             CalGraph(selectedMonth: selectedMonth)
                                 .environment(userAPVM)
@@ -75,8 +94,7 @@ struct LandingPage: View {
                             
                             Spacer(minLength: 15)
                             
-                            VStack{
-                                
+                            VStack {
                                 Text("Consommation de macronutriments du mois")
                                     .font(.headline)
                                     .foregroundColor(.white)
@@ -86,8 +104,8 @@ struct LandingPage: View {
                                     .environment(mealVM)
                                     .frame(width: 275, height: 20)
                                 
-                                HStack{
-                                    HStack{
+                                HStack {
+                                    HStack {
                                         Rectangle()
                                             .foregroundStyle(Color.customPurple)
                                             .frame(width: 15, height: 15)
@@ -95,9 +113,8 @@ struct LandingPage: View {
                                         Text("Glucides")
                                             .font(.system(size: 16, weight: .regular))
                                             .foregroundStyle(Color.white)
-                                            
                                     }
-                                    HStack{
+                                    HStack {
                                         Rectangle()
                                             .foregroundStyle(Color.customBlue)
                                             .frame(width: 15, height: 15)
@@ -105,9 +122,8 @@ struct LandingPage: View {
                                         Text("Protéines")
                                             .font(.system(size: 16, weight: .regular))
                                             .foregroundStyle(Color.white)
-                                            
                                     }
-                                    HStack{
+                                    HStack {
                                         Rectangle()
                                             .foregroundStyle(Color.customPink)
                                             .frame(width: 15, height: 15)
@@ -115,27 +131,27 @@ struct LandingPage: View {
                                         Text("Lipides")
                                             .font(.system(size: 16, weight: .regular))
                                             .foregroundStyle(Color.white)
-                                            
                                     }
                                 }
                             }
                             
                             Spacer(minLength: 30)
                             
-                            EatenVSBurnedCalGraph(selectedMonth: selectedMonth).environment(userAPVM).environment(mealVM)
+                            EatenVSBurnedCalGraph(selectedMonth: selectedMonth)
+                                .environment(userAPVM)
+                                .environment(mealVM)
                             
                             Spacer(minLength: 30)
                             
-                            VStack{
-                                
-                                if userAPVM.APs.count > 0{
-                                    APTimeGraph(selectedMonth: selectedMonth).environment(userAPVM)
-                                    
+                            VStack {
+                                if userAPVM.APs.count > 0 {
+                                    APTimeGraph(selectedMonth: selectedMonth)
+                                        .environment(userAPVM)
                                 } else {
                                     EmptyView()
                                 }
-                                
-                            }.padding(.bottom, 60)
+                            }
+                            .padding(.bottom, 60)
                         }
                     }
                 }
@@ -150,9 +166,11 @@ struct LandingPage: View {
                     .environment(APObjectiveVM)
                     .environment(userWeightVM)
                     .environment(weightObjectiveVM)
+                    .environment(foodVM)
+                    .environment(APVM)
             }
             .navigationDestination(isPresented: $navigateToWeekFromDropdown) {
-                LandingPageWeek(selectedDate: Date())  // Date actuelle
+                LandingPageWeek(selectedDate: Date())
                     .environment(mealVM)
                     .environment(userAPVM)
                     .environment(loginVM)
@@ -160,32 +178,51 @@ struct LandingPage: View {
                     .environment(APObjectiveVM)
                     .environment(userWeightVM)
                     .environment(weightObjectiveVM)
+                    .environment(foodVM)
+                    .environment(APVM)
             }
             .onChange(of: selectedDateInterval) { oldValue, newValue in
                 if newValue.lowercased() == "semaine" {
-                    navigateToWeekFromDropdown = true  // ✅
+                    navigateToWeekFromDropdown = true
                 }
             }
-
             .navigationBarBackButtonHidden()
-            
-
+            // ✅ Utilise .task au lieu de .onAppear
             .task {
+//                print("🔄 Chargement des données...")
+                
                 await APObjectiveVM.getMyAPObjective()
                 try? await dailyCalObjectiveVM.getMyDailyCalObjective()
                 try? await weightObjectiveVM.getMyWeightObjective()
-                if let userId = loginVM.currentUser?.id{
+                
+                if let userId = loginVM.currentUser?.id {
+                    await mealVM.getMyMeal()
+                    await userAPVM.getMyAP(userId: userId)
                     
-                try? await userAPVM.getMyAP(userId: userId)
+                    // ✅ ATTENDRE que les requêtes callback finissent
+                    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde
                 }
-
+                
+//                print("✅ Données chargées:")
+//                print("   - Meals:", mealVM.mealList.count)
+//                print("   - APs:", userAPVM.APs.count)
+//                
+                for meal in mealVM.mealList {
+//                    print("   - Meal date:", meal.date, "type:", meal.type)
+                }
+                
+                for ap in userAPVM.APs {
+//                    print("   - AP date:", ap.date, "type:", ap.type)
+                }
+                
+                dataLoaded = true
+                calendarRefreshID = UUID()
+            }            .onDisappear {
+                // ✅ Reset quand tu quittes la page
+                dataLoaded = false
             }
-          
-
-            
         }
-    }
-}
+    }}
 
 
 
@@ -201,4 +238,6 @@ struct LandingPage: View {
         .environment(MealViewModel())
         .environment(UserWeightViewModel())
         .environment(WeightObjectiveViewModel())
+        .environment(FoodViewModel())
+        .environment(APViewModel())
 }

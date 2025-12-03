@@ -1,15 +1,15 @@
 //
-//  MealViewModel.swift
+//  FoodViewModel.swift
 //  ZakFitFront
 //
-//  Created by Lucie Grunenberger  on 30/11/2025.
+//  Created by Lucie Grunenberger  on 02/12/2025.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class MealViewModel{
+class FoodViewModel{
     
     var token: String? {
         didSet {
@@ -46,10 +46,10 @@ class MealViewModel{
     }
     
     var meal: Meal? = nil
-    var mealList: [Meal] = []
+    var foodList: [Food] = []
 
     
-    func getMyMeal() async {
+    func getAllFood() async {
         
         
         guard let token = token
@@ -58,7 +58,7 @@ class MealViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/meal/user")
+        guard let url = URL(string: "http://localhost:8080/food/full")
         else {
             print("mauvais URL")
             
@@ -73,13 +73,13 @@ class MealViewModel{
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
-                //            let jsonString = String(data: data, encoding: .utf8)
-                //            print(jsonString ?? "No JSON")
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
                 
                 do{
-                    let decodedMeal = try JSONDecoder.withDateFormatting.decode([Meal].self, from: data)
+                    let decodedFood = try JSONDecoder.withDateFormatting.decode([Food].self, from: data)
                     DispatchQueue.main.async {
-                        self.mealList = decodedMeal
+                        self.foodList = decodedFood
                     }
                 }
                 catch {
@@ -94,7 +94,7 @@ class MealViewModel{
     }
     
     
-    func createMeal(with fields: [String: Any]) async {
+    func createFood(with fields: [String: Any]) async {
         
         
         guard let token = token
@@ -103,7 +103,7 @@ class MealViewModel{
             
             return }
         
-        guard let url = URL(string: "http://localhost:8080/meal")
+        guard let url = URL(string: "http://localhost:8080/food")
         else {
             print("mauvais URL")
             
@@ -127,14 +127,13 @@ class MealViewModel{
             }
             if let data = data {
 //
-                            let jsonString = String(data: data, encoding: .utf8)
-                            print(jsonString ?? "No JSON")
+//                            let jsonString = String(data: data, encoding: .utf8)
+//                            print(jsonString ?? "No JSON")
 
                 do {
-                    let decodedMeal = try JSONDecoder.withDateFormatting.decode(Meal.self, from: data)
+                    let decodedFood = try JSONDecoder.withDateFormatting.decode(Food.self, from: data)
                     DispatchQueue.main.async {
-                        self.mealList.append(decodedMeal)
-                        self.meal = decodedMeal
+                        self.foodList.append(decodedFood)
                     }
                 
                 } catch {
