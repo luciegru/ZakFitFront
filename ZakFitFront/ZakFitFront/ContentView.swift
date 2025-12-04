@@ -19,6 +19,8 @@ struct ContentView: View {
     @State var userWeightVM = UserWeightViewModel()
     @State var foodVM = FoodViewModel()
     @State var APVM = APViewModel()
+    @State var userFoodPrefVM = UserFoodPreferenceViewModel()
+    @State var foodPrefVM = FoodPreferenceViewModel()
 
     
     var body: some View {
@@ -36,7 +38,7 @@ struct ContentView: View {
                     case .dashboard:
                         Dashboard()
                     case .profil:
-                        Button(action: {loginVM.logout()}, label: {Text("logout")})
+                        ProfilView()
                     case .historique:
                         Text("Historiquentm")
                     }
@@ -59,6 +61,8 @@ struct ContentView: View {
                 .environment(userWeightVM)
                 .environment(foodVM)
                 .environment(APVM)
+                .environment(userFoodPrefVM)
+                .environment(foodPrefVM)
                 .navigationBarBackButtonHidden()
         } else {
             OBPage1()
@@ -79,4 +83,7 @@ struct ContentView: View {
         .environment(UserViewModel())
         .environment(APObjectiveViewModel())
         .environment(APViewModel())
+        .environment(UserFoodPreferenceViewModel())
+        .environment(FoodViewModel())
+        .environment(FoodPreferenceViewModel())
 }
