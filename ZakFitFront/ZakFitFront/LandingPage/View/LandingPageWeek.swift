@@ -25,6 +25,7 @@ struct LandingPageWeek: View {
     @State private var navigateToMonth: Bool = false
     @State private var showingMealSheet = false
     @State private var showingAPSheet = false
+    @State private var showingWeightSheet = false
 
     
     @State var mealFoodVM: MealFoodViewModel = MealFoodViewModel()
@@ -366,7 +367,9 @@ struct LandingPageWeek: View {
                                 
                                 Spacer()
                                 
-                                Button(action: {}, label:{
+                                Button(action: {
+                                    showingWeightSheet.toggle()
+                                }, label:{
                                     HStack{
                                         Text("Modifier mon poids")
                                             .foregroundStyle(Color(.white))
@@ -376,7 +379,15 @@ struct LandingPageWeek: View {
                                             .foregroundStyle(Color(.white))
                                         
                                     }
-                                })
+                                }).sheet(isPresented: $showingWeightSheet, onDismiss: {
+                                    Task {
+                                    }
+                                }) {
+                                    WeightSheet()
+                                        .environment(loginVM)
+                                        .environment(userWeightVM)
+                                }
+
                             }.padding(30)
                             
                             //graph de poids

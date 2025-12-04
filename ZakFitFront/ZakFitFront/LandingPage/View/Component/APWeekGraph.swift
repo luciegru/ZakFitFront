@@ -26,37 +26,40 @@ struct APWeekGraph: View {
         let sortedTypes = nonEmptyTypes.sorted { $0.total > $1.total }
         let top4 = Array(sortedTypes.prefix(4))
         
-        
-        
-        HStack{
-            ForEach(top4, id: \.type) { item in
-                VStack {
-                    
-                    
-                    
-                    Text("\(item.total)")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundColor(.customPink)
-                    
-                    Text("minutes")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.black)
-                    
-                    Text(item.type)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.black)
-                    
+        VStack{
+            
+            HStack{
+                ForEach(top4, id: \.type) { item in
+                    VStack {
+                        
+                        
+                        
+                        Text("\(item.total)")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(.customPink)
+                        
+                        Text("minutes")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.black)
+                        
+                        Text(item.type)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.black)
+                        
+                    }
+                    .padding()
                 }
-                .padding()
+                
             }
             
             EatenVSBurnedCalWeek(selectedDay: selectedDay)
                 .environment(userAPViewModel)
                 .environment(mealVM)
             
+
+                
         }.background(Color.customLightPurple)
             .cornerRadius(20)
-            .frame(height: 120)
     }
 }
 

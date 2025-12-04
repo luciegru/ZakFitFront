@@ -19,36 +19,19 @@ struct CalGraphWeek: View {
 
         VStack(alignment: .leading, spacing: 8) {
             
-//            let _ = {
-//                print("==== DEBUG WEEK GRAPH ====")
-//
-//                for ap in APNeeded {
-//                    print("AP date brute :", ap.date)
-//                    print("AP burnedCal :", ap.burnedCal)
-//                }
-//
-//                let normalized = APNeeded.map { ap in
-//                    (Calendar.current.startOfDay(for: ap.date), ap.burnedCal)
-//                }
-//
-//                for n in normalized {
-//                    print("Normalized day :", n.0)
-//                }
-//
-//                print("Max burnedCal :", APNeeded.map{$0.burnedCal}.max() ?? -1)
-//                print("Objective :", APObjectiveVM.APObj?.burnedCal ?? -1)
-//                
-//                print("---- NORMALIZED ----")
-//                for p in normalized {
-//                    print("x:", p.0, "y:", p.1)
-//                }
-//
-//                print("==== END DEBUG ====")
-//            }()
 
             let calendar = Calendar.current
-            let normalized = APNeeded.map { (Calendar.current.startOfDay(for: $0.date), $0.burnedCal) }
-                .sorted { $0.0 < $1.0 }
+            
+            let groupedByDay = Dictionary(grouping: APNeeded) { ap in
+                        Calendar.current.startOfDay(for: ap.date)
+                    }
+                    .mapValues { aps in
+                        aps.reduce(0) { $0 + $1.burnedCal }
+                    }
+                    .sorted { $0.key < $1.key }
+            
+            let normalized = groupedByDay.map { ($0.key, $0.value) }
+
 
 
             

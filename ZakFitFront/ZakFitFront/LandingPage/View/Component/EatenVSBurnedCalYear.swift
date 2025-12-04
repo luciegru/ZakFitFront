@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EatenVSBurnedCalWeek: View {
+struct EatenVSBurnedCalYear: View {
     @Environment(UserAPViewModel.self) var userAPVM
     @Environment(MealViewModel.self) var userMealVM
     var selectedDay: Date
@@ -16,8 +16,8 @@ struct EatenVSBurnedCalWeek: View {
     
     var body: some View {
         
-        let APNeeded = userAPVM.APs.filter { $0.date.isInSameWeek(as: selectedDay) }
-        let CalNeeded = userMealVM.mealList.filter { $0.date.isInSameWeek(as: selectedDay) }
+        let APNeeded = userAPVM.APs.filter { $0.date.isInSameYear(as: selectedDay) }
+        let CalNeeded = userMealVM.mealList.filter { $0.date.isInSameYear(as: selectedDay) }
 
         
         let APCal = APNeeded.reduce(0) { $0 + $1.burnedCal }
@@ -66,5 +66,5 @@ struct EatenVSBurnedCalWeek: View {
 }
 
 #Preview {
-//    EatenVSBurnedCalWeek()
+//    EatenVSBurnedCalYear()
 }
