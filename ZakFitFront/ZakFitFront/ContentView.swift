@@ -34,9 +34,9 @@ struct ContentView: View {
                     case .calendrier:
                         LandingPage()
                     case .dashboard:
-                        Button(action: {loginVM.logout()}, label: {Text("logout")})
+                        Dashboard()
                     case .profil:
-                        Text("Profil")
+                        Button(action: {loginVM.logout()}, label: {Text("logout")})
                     case .historique:
                         Text("Historiquentm")
                     }

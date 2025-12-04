@@ -199,26 +199,12 @@ struct LandingPage: View {
                     await mealVM.getMyMeal()
                     await userAPVM.getMyAP(userId: userId)
                     
-                    // ✅ ATTENDRE que les requêtes callback finissent
-                    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde
-                }
-                
-//                print("✅ Données chargées:")
-//                print("   - Meals:", mealVM.mealList.count)
-//                print("   - APs:", userAPVM.APs.count)
-//                
-                for meal in mealVM.mealList {
-//                    print("   - Meal date:", meal.date, "type:", meal.type)
-                }
-                
-                for ap in userAPVM.APs {
-//                    print("   - AP date:", ap.date, "type:", ap.type)
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 
                 dataLoaded = true
                 calendarRefreshID = UUID()
             }            .onDisappear {
-                // ✅ Reset quand tu quittes la page
                 dataLoaded = false
             }
         }

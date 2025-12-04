@@ -15,8 +15,16 @@ struct CalGraph: View {
     
     var body: some View {
         let APNeeded = userAPViewModel.APs.filter { $0.date.isInSameMonth(as: selectedMonth) }
-        let normalized = APNeeded.map { (Calendar.current.startOfDay(for: $0.date), $0.burnedCal) }
-            .sorted { $0.0 < $1.0 }
+        let groupedByDay = Dictionary(grouping: APNeeded) { ap in
+                    Calendar.current.startOfDay(for: ap.date)
+                }
+                .mapValues { aps in
+                    aps.reduce(0) { $0 + $1.burnedCal }
+                }
+                .sorted { $0.key < $1.key }
+        
+        let normalized = groupedByDay.map { ($0.key, $0.value) }
+
 
         VStack(alignment: .leading, spacing: 8) {
             Text("Calories brûlées chaque jour ce mois-ci")

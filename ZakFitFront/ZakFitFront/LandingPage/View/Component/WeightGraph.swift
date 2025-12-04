@@ -23,6 +23,8 @@ struct WeightGraph: View {
             weightData.map { $0.1 }.max() ?? 0,
             weightObjectiveVM.WeightObj?.targetWeight ?? 0
         ) + 2 // marge
+        
+        
 
         VStack(alignment: .leading, spacing: 8) {
             Text("Évolution du poids")
