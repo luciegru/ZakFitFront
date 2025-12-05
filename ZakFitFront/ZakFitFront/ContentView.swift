@@ -40,7 +40,7 @@ struct ContentView: View {
                     case .profil:
                         ProfilView()
                     case .historique:
-                        Text("Historiquentm")
+                        History()
                     }
                 }
                 .ignoresSafeArea()
@@ -65,7 +65,18 @@ struct ContentView: View {
                 .environment(foodPrefVM)
                 .navigationBarBackButtonHidden()
         } else {
-            OBPage1()
+            OBPage1().environment(loginVM)
+                .environment(dailyCalObjectiveVM)
+                .environment(weightObjectiveVM)
+                .environment(mealVM)
+                .environment(userAPVM)
+                .environment(APObjectiveVM)
+                .environment(userWeightVM)
+                .environment(foodVM)
+                .environment(APVM)
+                .environment(userFoodPrefVM)
+                .environment(foodPrefVM)
+                .navigationBarBackButtonHidden()
             
         }
        

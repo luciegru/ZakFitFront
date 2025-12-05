@@ -330,6 +330,7 @@ struct LandingPageWeek: View {
                                     .environment(mealVM)
                                     .environment(loginVM)
                                     .id(selectedDay)
+                                    .id("\(selectedDay)-\(userAPVM.APs.count)")
                             }.padding(.bottom,20)
                             
                             VStack{

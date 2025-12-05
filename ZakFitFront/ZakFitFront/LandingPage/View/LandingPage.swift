@@ -87,6 +87,7 @@ struct LandingPage: View {
                                 .environment(dailyCalObjectiveVM)
                                 .environment(weightObjectiveVM)
                                 .environment(mealVM)
+                                .environment(userWeightVM)
                             
                             CalGraph(selectedMonth: selectedMonth)
                                 .environment(userAPVM)
@@ -194,6 +195,7 @@ struct LandingPage: View {
                 await APObjectiveVM.getMyAPObjective()
                 try? await dailyCalObjectiveVM.getMyDailyCalObjective()
                 try? await weightObjectiveVM.getMyWeightObjective()
+                try? await userWeightVM.getMyWeight()
                 
                 if let userId = loginVM.currentUser?.id {
                     await mealVM.getMyMeal()
@@ -204,7 +206,9 @@ struct LandingPage: View {
                 
                 dataLoaded = true
                 calendarRefreshID = UUID()
-            }            .onDisappear {
+            }
+            
+            .onDisappear {
                 dataLoaded = false
             }
         }

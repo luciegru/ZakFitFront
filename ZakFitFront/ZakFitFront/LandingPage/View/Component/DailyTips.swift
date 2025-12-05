@@ -14,6 +14,7 @@ struct DailyTips: View {
     @Environment(DailyCalObjectiveViewModel.self) var calObjVM
     @Environment(WeightObjectiveViewModel.self) var weightObjVM
     @Environment(MealViewModel.self) var mealVM
+    @Environment(UserWeightViewModel.self) var weightVM
     
     // MARK: - Objectif AP (calories brûlées)
     private var apProgress: (actual: Int, target: Int, text: String, show: Bool) {
@@ -97,7 +98,9 @@ struct DailyTips: View {
             return (0, 0, "", false)
         }
         
-        let startWeight = currentWeight
+        // Ou le premier poids chronologiquement
+        let sortedWeights = weightVM.weightList.sorted { $0.date < $1.date }
+        let startWeight = sortedWeights.first?.weight ?? currentWeight
         
         // Calcul de la progression
         let totalToLose = abs(startWeight - targetWeight)
@@ -108,13 +111,23 @@ struct DailyTips: View {
         
         // Calcul du temps restant
         let calendar = Calendar.current
-        let daysRemaining = calendar.dateComponents([.day], from: Date(), to: endDate).day ?? 0
-        let timeText = daysRemaining > 30 ? "\(daysRemaining / 30) mois" : "\(daysRemaining) jours"
+        let daysRemaining = max(0, calendar.dateComponents([.day], from: Date(), to: endDate).day ?? 0)
+        let timeText: String
+        if daysRemaining == 0 {
+            timeText = "terminé"
+        } else if daysRemaining > 30 {
+            timeText = "en \(daysRemaining / 30) mois"
+        } else {
+            timeText = "en \(daysRemaining) jours"
+        }
         
-        let text = "\(action) \(Int(totalToLose))kg en \(timeText)"
+        let text = "\(action) \(String(format: "%.1f", totalToLose))kg en \(timeText)"
         
         return (alreadyLost, totalToLose, text, true)
     }
+    
+    
+    
     
     // MARK: - Message Zak
     private var messageZak: String {
@@ -207,4 +220,5 @@ struct DailyTips: View {
         .environment(DailyCalObjectiveViewModel())
         .environment(WeightObjectiveViewModel())
         .environment(MealViewModel())
+        .environment(UserWeightViewModel())
 }

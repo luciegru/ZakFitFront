@@ -13,18 +13,38 @@ struct MealCard: View {
     @State private var foods: [Food] = []
     var selectedDay: Date
     
+    private var normalizedMealType: String {
+        let cleaned = meal.type
+            .lowercased()
+            .folding(options: .diacriticInsensitive, locale: .current)
+            .trimmingCharacters(in: .whitespaces)
+        
+        switch cleaned {
+        case "petit dejeuner", "petit déjeuner", "breakfast":
+            return "breakfast"
+        case "dejeuner", "déjeuner", "lunch":
+            return "lunch"
+        case "diner", "dîner", "dinner":
+            return "diner"
+        case "snack", "snacj", "gouter", "goûter":
+            return "snack"
+        default:
+            return "snack"
+        }
+    }
+
     private var mealTypeText: String {
-        switch meal.type {
+        switch normalizedMealType {
         case "breakfast": return "Petit \ndéjeuner"
         case "lunch": return "Déjeuner"
         case "snack": return "Goûter"
         case "diner": return "Dîner"
-        default: return meal.type
+        default: return "Snack"
         }
     }
-    
+
     private var mealImage: ImageResource {
-        switch meal.type {
+        switch normalizedMealType {
         case "breakfast": return .breakfast
         case "lunch": return .lunch
         case "snack": return .snack
@@ -32,7 +52,6 @@ struct MealCard: View {
         default: return .snack
         }
     }
-    
     var body: some View {
         ZStack(alignment: .topLeading) {
             Image(mealImage)
