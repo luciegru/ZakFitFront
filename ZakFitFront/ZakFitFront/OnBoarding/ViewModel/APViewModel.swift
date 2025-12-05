@@ -93,7 +93,20 @@ class APViewModel{
         
     }
     
-    
+    func getAPByIdWithReturn(APId: UUID) async throws -> AP {
+        guard let token = token else { throw URLError(.userAuthenticationRequired) }
+        guard let url = URL(string: "http://localhost:8080/AP/\(APId)") else { throw URLError(.badURL) }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let decodedAP = try JSONDecoder.withDateFormatting.decode(AP.self, from: data)
+        return decodedAP
+    }
+
     func createAP(with fields: [String: Any]) async {
         
 //        print("je rentre dans la fonction")

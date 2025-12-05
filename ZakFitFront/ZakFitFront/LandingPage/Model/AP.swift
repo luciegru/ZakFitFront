@@ -15,3 +15,4 @@ struct AP: Codable, Identifiable, Equatable {
     let type: String
     let burnedCal: Int
 }
+

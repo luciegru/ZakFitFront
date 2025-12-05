@@ -78,7 +78,7 @@ struct CalGraphWeek: View {
                 }
             }
             .chartYScale(domain: 0...(max(
-                (APNeeded.map { $0.burnedCal }.max() ?? 0),
+                (normalized.map { $0.1 }.max() ?? 0),
                 (APObjectiveVM.APObj?.burnedCal ?? 0)
             ) + 50))
             .padding()

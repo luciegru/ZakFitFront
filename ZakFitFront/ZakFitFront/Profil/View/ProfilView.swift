@@ -61,20 +61,27 @@ struct ProfilView: View {
                     Text(loginVM.currentUser?.email ?? "")
                         .foregroundStyle(Color.white)
                         .font(.system(size: 10))
+                        .padding(.bottom, 20)
                     
-                    Text("Régime alimentaire :")
-                        .foregroundStyle(Color.white)
-                        .font(.system(size: 20))
-                        .padding(.top, 15)
-                    HStack {
-                        ForEach(userFoodPrefVM.myUserFoodPrefs) { myUserPref in
-                            if let pref = foodPrefVM.foodPrefs.first(where: { $0.id == myUserPref.foodPreference }) {
-                                Text(pref.name)
-                                    .foregroundStyle(.white)
-                                    .font(.system(size: 18))
+                    VStack{
+                        
+                        Text("Régime alimentaire :")
+                            .foregroundStyle(Color.white)
+                            .font(.system(size: 20))
+                            .padding(.top, 15)
+                        HStack {
+                            ForEach(userFoodPrefVM.myUserFoodPrefs) { myUserPref in
+                                if let pref = foodPrefVM.foodPrefs.first(where: { $0.id == myUserPref.foodPreference }) {
+                                    Text(pref.name)
+                                        .foregroundStyle(.white)
+                                        .font(.system(size: 18))
+                                }
                             }
-                        }
-                    }
+                        }.padding(.bottom, 15)
+                            .padding(.horizontal, 10)
+
+                    }.background(.customPink)
+                        .cornerRadius(20)
                     
                     
                     Button(action: {}, label:{
@@ -89,7 +96,7 @@ struct ProfilView: View {
                                 .padding(20)
                             
                             
-                        }})
+                        }}).padding(.bottom, 40)
                     
                     HStack {
                         
@@ -142,7 +149,7 @@ struct ProfilView: View {
                                 .foregroundStyle(Color.white)
                             
                             
-                        }
+                        }.padding(.trailing, 20)
                         
                         
                     }
@@ -171,6 +178,7 @@ struct ProfilView: View {
                                 .environment(loginVM)
                                 .environment(userWeightVM)
                         }
+                        .padding(.bottom, 40)
                     
                     
                     Text("Mon objectif de santé : ")
@@ -188,6 +196,7 @@ struct ProfilView: View {
                         .environment(dailyCalObjVM)
                         .environment(weightObjVM)
                         .environment(mealVM)
+                        .environment(userWeightVM)
                         .padding()
                         .background(Color.customPink)
                         .cornerRadius(20)
@@ -268,6 +277,7 @@ struct ProfilView: View {
                 
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
             }
+            try? await userWeightVM.getMyWeight()
 
 
         }
